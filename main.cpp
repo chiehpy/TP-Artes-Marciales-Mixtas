@@ -24,12 +24,52 @@ void cargar_ordenado(NodoLuchadorSE *&, Luchador&);
 void actualizar_ranking(Luchador [],NodoLuchadorSE *&);
 
 // Función sugerida
-Luchador ingresar_luchador();
+Luchador ingresar_luchador() {
+    
+    Luchador nuevo;
+    cout << "\n Ingresar datos del nuevo atleta: " << endl;
+    
+    cout << "ID: ";
+    cin >> nuevo.id;
+    cin.ignore(); 
+
+    cout << "Nombre (max 10 caracteres): "; //Se acepta un nombre, por eso no uso getinline...
+    cin >> nuevo.nombre;
+
+    cout << "Apodo (max 10 caracteres): ";
+    cin.getline(nuevo.apodo, 11);
+    
+    cout << "Peso: ";
+    cin >> nuevo.peso;
+
+    cout << "Cantidad de Victorias: ";
+    cin >> nuevo.victorias;
+
+    cout << "Cantidad de Derrotas: ";
+    cin >> nuevo.derrotas;
+
+    return nuevo;
+}
+
+void cargar_desde_archivo(NodoLuchadorSE *&lista) {
+    FILE *f = fopen("archivo.dat", "rb");
+    if (f == NULL) 
+        return;
+    
+    Luchador aux;
+
+    while (fread(&aux, sizeof(Luchador), 1, f)) {
+        cargar_ordenado(lista, aux);
+    }
+    fclose(f);
+}
 
 int main()
 {
     Luchador ranking[10];
     NodoLuchadorSE *lista=NULL;
+    cargar_desde_archivo(lista);
+    menu(ranking, lista);
 
     // Libero la memoria
     while (lista)
