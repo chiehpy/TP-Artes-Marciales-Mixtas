@@ -22,6 +22,8 @@ Luchador busqueda_id_secuencial(NodoLuchadorSE *&, int);
 void liberar_memoria(NodoLuchadorSE *&, int);
 void cargar_ordenado(NodoLuchadorSE *&, Luchador&);
 void actualizar_ranking(Luchador [],NodoLuchadorSE *&);
+void main_card(NodoLuchadorSE *&, Luchador [][5], int []);
+
 
 // Función sugerida
 Luchador ingresar_luchador();
@@ -47,6 +49,17 @@ void menu(Luchador vec[], NodoLuchadorSE *&lista)
     // El usuario quiere salir del bucle cuando esta variable sea TRUE
 
     int id;
+
+    //esto es para la "2- Generar Main Card:
+    Luchador lucha_estelar[8][5];
+    int contadores[8];
+    struct categorias_peso
+    {
+        char peso[11];
+    };
+
+    categorias_peso categoria[8] = {{"Mosca"},{"Gallo"},{"Pluma"},{"Ligero"},{"Wélter"},{"Medio"},{"Semipesado"},{"Pesado"}};
+
     // Variable sugerida
     Luchador luchador;
     
@@ -72,15 +85,30 @@ void menu(Luchador vec[], NodoLuchadorSE *&lista)
                 break;
             
             case 2:
-                // Copiar los primeros 5 luchadores de la lista dinámica
-                // a un arreglo estático para representar los combates estelares.
-                actualizar_ranking(vec,lista);
 
                 cout<<"Los luchadores que participarán en las peleas estelares:"<<endl;
-                for (int i = 0; i < 5; i++)
+
+                main_card(lista, lucha_estelar, contadores);
+
+                for (int i = 0; i < 8; i++)
                 {
-                    cout<<"Top "<<i+1<<": "<<vec[i].nombre<<endl;
+                    cout << "Categoria " << categoria[i].peso << endl;
+
+                    if (contadores[i] == 0)
+                        cout << "No hay luchadores\n";
+                    else
+                    {
+                        for (int j = 0; j < contadores[i]; j++)
+                        {
+                            cout << "Top " << j+1 << endl;
+                            cout << "ID: " << lucha_estelar[i][j].id << endl;
+                            cout << "Nombre: " << lucha_estelar[i][j].nombre << endl;
+                            cout<< "Victorias: " << lucha_estelar[i][j].victorias << endl;
+                            cout<< "Derrotas: "<< lucha_estelar[i][j].derrotas<< endl;
+                        }
+                    }
                 }
+                        
                 break;
             
             case 3:
@@ -121,6 +149,7 @@ void menu(Luchador vec[], NodoLuchadorSE *&lista)
                 // Si el usuario ingresa un número fuera del rango 1-5
                 salida = true;
         }
+        
 
     }while (!salida);
     /*
@@ -176,10 +205,16 @@ void actualizar_ranking(Luchador vec[],NodoLuchadorSE *&lista)
 
 void liberar_memoria(NodoLuchadorSE *&lista, int id)
 {
+    //verifico si la lista esta vacio (=NULL)
+    if (!lista) 
+    return;
+
+    //si no esta basia sige el choclo
+
     NodoLuchadorSE* actual=lista;
     NodoLuchadorSE* anterior=NULL;
     NodoLuchadorSE* eliminar=NULL;
-
+    
     // Si el nodo a eliminar es el primero
     if (actual->info.id ==id)
     {
@@ -190,7 +225,7 @@ void liberar_memoria(NodoLuchadorSE *&lista, int id)
     else
     {
         // Busco el nodo con el ID a eliminar
-        while (actual->info.id !=id)
+        while (actual && actual->info.id !=id)
         {
             anterior=actual;
             actual=actual->sgte;
@@ -230,4 +265,53 @@ Luchador busqueda_id_secuencial(NodoLuchadorSE *&lista, int id)
     Luchador no_existe;
     no_existe.id =-1;
     return no_existe;
+}
+
+
+void main_card(NodoLuchadorSE *& lista, Luchador v[8][5], int contadores[8])
+{ /*
+    Peso Mosca (Flyweight): hasta 125 lbs (56.7 kg).
+    Peso Gallo (Bantamweight): hasta 135 lbs (61.2 kg).
+    Peso Pluma (Featherweight): hasta 145 lbs (65.8 kg).
+    Peso Ligero (Lightweight): hasta 155 lbs (70.3 kg).
+    Peso Wélter (Welterweight): hasta 170 lbs (77.1 kg).
+    Peso Medio (Middleweight): hasta 185 lbs (83.9 kg).
+    Peso Semipesado (Light Heavyweight): hasta 205 lbs (93.0 kg).
+    Peso Pesado (Heavyweight): 206 a 265 lbs (93.4 - 120.2 kg).
+    */
+   NodoLuchadorSE *paux= lista;
+    for (int i = 0; i < 8; i++)
+    {
+        contadores[i] = 0;
+    }
+
+    while (paux)
+    {
+        int categoria = -1;
+
+        if (paux->info.peso <=56.7)
+        categoria = 0;
+        else if (paux->info.peso <=61.2) 
+        categoria = 1;
+        else if (paux->info.peso <=65.8) 
+        categoria = 2;
+        else if (paux->info.peso <=70.3) 
+        categoria = 3;
+        else if (paux->info.peso <=77.1) 
+        categoria = 4;
+        else if (paux->info.peso <=83.9) 
+        categoria = 5;
+        else if (paux->info.peso <=93.0) 
+        categoria = 6;
+        else if (paux->info.peso <=120.2) 
+        categoria = 7;
+
+        if (categoria != -1 && contadores[categoria] < 5)
+        {
+            v[categoria][contadores[categoria]] = paux->info;
+            contadores[categoria]++;
+        }
+
+        paux = paux->sgte;
+    }
 }
