@@ -239,7 +239,11 @@ void liberar_memoria(NodoLuchadorSE *&lista, int id)
             anterior=actual;
             actual=actual->sgte;
         }
-        
+        if (!actual){//por si no encuentra el id.
+            cout << "ID no encontrado\n";
+            return;
+        }
+
         // El nodo actual es el que se debe eliminar
         eliminar=actual;
         actual=actual->sgte;
