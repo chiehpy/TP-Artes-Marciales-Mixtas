@@ -1,6 +1,7 @@
 #include <iostream>
 using namespace std;
 
+//structs del programa
 struct Luchador
 {
     int id;
@@ -17,24 +18,28 @@ struct NodoLuchadorSE
     NodoLuchadorSE *sgte;
 };
 
+//funciones del programa
 void menu(Luchador [],NodoLuchadorSE *&);
 Luchador busqueda_id_secuencial(NodoLuchadorSE *&, int);
 void liberar_memoria(NodoLuchadorSE *&, int);
 void cargar_ordenado(NodoLuchadorSE *&, Luchador&);
 void actualizar_ranking(Luchador [],NodoLuchadorSE *&);
 void main_card(NodoLuchadorSE *&, Luchador [][5], int []);
-
+void mostrar_lista(NodoLuchadorSE *lista);
+void guardar_gimnasio(NodoLuchadorSE *lista);
+void cargarGimnasio(NodoLuchadorSE *&lista);
 
 // Función sugerida
 Luchador ingresar_luchador();
 
 int main()
 {
-    Luchador ranking[10];
+    Luchador ranking[10]; // asigno cuantos luchadores va a almacenar el ranking
     NodoLuchadorSE *lista=NULL;
+    cargarGimnasio(lista);
 
-    // Libero la memoria
-    while (lista)
+   
+    while (lista)  // Libero la memoria
     {
         liberar_memoria(lista,lista->info.id);
     }
@@ -112,31 +117,37 @@ void menu(Luchador vec[], NodoLuchadorSE *&lista)
                 break;
             
             case 3:
-                // Buscar un luchador por ID y modificar su contador
-                // de victorias y derrotas.
-                cin>>id;
-                luchador=busqueda_id_secuencial(lista,id);
+                // Me pide buscar un luchador por ID y modificar su contador de victorias y derrotas
+                cout << "Ingrese el ID del luchador a actualizar: ";
+                cin >> id; //ingreso el ID del luchador a actualizar
                 
-                if (luchador.id < 0 )
+                luchador = busqueda_id_secuencial(lista, id); //busco al luchador por ID en la lista
+                
+                if (luchador.id < 0) //confirmo si existe el id ingresado
                 {
-                    cout<<"El ID del luchador no existe"<<endl;
+                    cout << "El ID del luchador no existe" << endl; 
                 }
                 else
                 {
-                    /*
-                    Aquí se deberían modificar los contadores
-                    de victorias y derrotas del luchador.
-                    Puede hacerse con una función o directamente aquí.
-                    */
+                    cout << "Luchador encontrado: " << luchador.nombre << endl;
+                    cout << "Victorias actuales: " << luchador.victorias << endl;
+                    cout << "Derrotas actuales: " << luchador.derrotas << endl;
+                    //datos actuales del luchador encontrado
+
+                    cout << "\nIngrese nuevas victorias: "; cin >> luchador.victorias; 
+                    cout << "Ingrese nuevas derrotas: "; cin >> luchador.derrotas;
+                    //actualizo los datos del luchador encontrado
+
+                    liberar_memoria(lista, id); // Tengo q eliminar la versión vieja del nodo
+                    cargar_ordenado(lista, luchador); // se inserta al luchador actualizado y se reordena automáticamente
                     
-                    // "Actualización"
-                    liberar_memoria(lista,id); // Elimino la versión vieja del nodo
-                    cargar_ordenado(lista,luchador); // Inserto el luchador actualizado
+                    cout << "Récord actualizado exitosamente." << endl;
                 }
                 break;
 
             case 4:
                 // Guardar la lista dinámica en un archivo.
+                guardar_gimnasio(lista);
                 break;
 
             case 5:
@@ -314,4 +325,105 @@ void main_card(NodoLuchadorSE *& lista, Luchador v[8][5], int contadores[8])
 
         paux = paux->sgte;
     }
+}
+
+void mostrar_lista(NodoLuchadorSE *lista)
+{
+    if (!lista)
+    {
+        cout << "La lista está vacía." << endl;
+        return;
+    }
+
+    NodoLuchadorSE *paux = lista;
+    int contador = 1;
+
+    cout << "\n=== LISTA DE LUCHADORES ===" << endl;
+    
+    while (paux)
+    {
+        cout << "\nLuchador #" << contador << endl;
+        cout << "ID: " << paux->info.id << endl;
+        cout << "Nombre: " << paux->info.nombre << endl;
+        cout << "Apodo: " << paux->info.apodo << endl;
+        cout << "Peso: " << paux->info.peso << " kg" << endl;
+        cout << "Victorias: " << paux->info.victorias << endl;
+        cout << "Derrotas: " << paux->info.derrotas << endl;
+        cout << "Puntaje: " << (paux->info.victorias - paux->info.derrotas) << endl;
+        
+        paux = paux->sgte;
+        contador++;
+    }
+    cout << "\n" << endl;
+}
+
+void guardar_gimnasio(NodoLuchadorSE *lista)
+{
+    if (!lista)
+    {
+        cout << "La lista está vacía. No hay nada que guardar." << endl;
+        return;
+    }
+
+    FILE *archivo = fopen("luchadores.dat", "wb");
+    
+    if (archivo == NULL)
+    {
+        cout << "Error al abrir el archivo para guardar." << endl;
+        return;
+    }
+
+    NodoLuchadorSE *paux = lista;
+    int cantidad = 0;
+
+    // Cuento cuántos luchadores hay
+    while (paux)
+    {
+        cantidad++;
+        paux = paux->sgte;
+    }
+
+    fwrite(&cantidad, sizeof(int), 1, archivo); // Escribo la cantidad de luchadores
+
+    // Escribo cada luchador
+    paux = lista;
+    while (paux)
+    {
+        fwrite(&(paux->info), sizeof(Luchador), 1, archivo);
+        paux = paux->sgte;
+    }
+
+    fclose(archivo);
+    cout << "Gimnasio guardado exitosamente en 'luchadores.dat'" << endl;
+}
+
+/* funcion cargarGimanasio:
+1. Abrir el archivo
+2. Comprobamos que el archivo exista
+3. Leemos cantidad de luchadores fread almacena cantidad
+4. Bucle de iteracion, cada vez que corra almacena un luchador
+5. Se carga en "lista" en memoria
+6. Cerrar el archivo
+*/
+
+
+
+void cargarGimnasio(NodoLuchadorSE *&lista){
+    FILE* archivo = fopen("luchadores.dat", "rb");
+
+    if(archivo == NULL){
+        cout << "El archivo no existe, no hay nada que cargar"<< endl;
+        return;
+    }
+    int cantidad;
+    fread(&cantidad, sizeof(int), 1, archivo);
+    Luchador luchador;
+    for(int i = 0; i < cantidad; i++){
+        fread(&luchador, sizeof(Luchador), 1, archivo);
+        cargar_ordenado(lista, luchador);
+
+    }
+    fclose(archivo);
+    cout << "Los luchadores fueron cargados en la lista"<< endl;
+    return;
 }
