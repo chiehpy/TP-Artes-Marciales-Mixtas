@@ -14,7 +14,7 @@ struct Luchador {
 };
 
 int main() {
-    FILE *f = fopen("gimnasio.dat", "wb");
+    FILE *f = fopen("luchadores.dat", "wb");
     if (!f) return 1;
 
     Luchador atletas[15];
@@ -35,9 +35,11 @@ int main() {
     atletas[13] = {14, "Morena",  "The Boss",   67.5, 55, 9}; 
     atletas[14] = {15, "Mirta",   "The Legend", 63.5, 70, 4};
 
+    int cantidad = 15;
+    fwrite(&cantidad, sizeof(int), 1, f);
     fwrite(atletas, sizeof(Luchador), 15, f);
     fclose(f);
 
-    cout << "Archivo 'gimnasio.dat' generado con 3 luchadores para testear." << endl;
+    cout << "Archivo 'luchadores.dat' generado con 3 luchadores para testear." << endl;
     return 0;
 }

@@ -57,26 +57,13 @@ Luchador ingresar_luchador() {
     return nuevo;
 }
 
-void cargar_desde_archivo(NodoLuchadorSE *&lista) {
-    FILE *f = fopen("archivo.dat", "rb");
-    if (f == NULL) 
-        return;
-    
-    Luchador aux;
-
-    while (fread(&aux, sizeof(Luchador), 1, f)) {
-        cargar_ordenado(lista, aux);
-    }
-    fclose(f);
-}
 
 int main()
 {
     Luchador ranking[10]; // asigno cuantos luchadores va a almacenar el ranking
     NodoLuchadorSE *lista=NULL;
     cargarGimnasio(lista);
-
-   
+    mostrar_lista(lista);
     while (lista)  // Libero la memoria
     {
         liberar_memoria(lista,lista->info.id);
