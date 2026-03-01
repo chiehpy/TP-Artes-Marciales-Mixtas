@@ -6,8 +6,8 @@ using namespace std;
 
 struct Luchador {
     int id;
-    char nombre[11];
-    char apodo[11]; 
+    char nombre[30+1];
+    char apodo[30+1]; 
     float peso; 
     int victorias;
     int derrotas;
@@ -40,6 +40,6 @@ int main() {
     fwrite(atletas, sizeof(Luchador), 15, f);
     fclose(f);
 
-    cout << "Archivo 'luchadores.dat' generado con 3 luchadores para testear." << endl;
+    cout << "Archivo 'luchadores.dat' generado." << endl;
     return 0;
 }

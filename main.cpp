@@ -5,8 +5,8 @@ using namespace std;
 struct Luchador
 {
     int id;
-    char nombre[10+1];
-    char apodo[10+1]; 
+    char nombre[30+1];
+    char apodo[30+1]; 
     float peso; 
     int victorias;
     int derrotas;
@@ -24,34 +24,43 @@ Luchador busqueda_id_secuencial(NodoLuchadorSE *&, int);
 void liberar_memoria(NodoLuchadorSE *&, int);
 void cargar_ordenado(NodoLuchadorSE *&, Luchador&);
 void actualizar_ranking(Luchador [],NodoLuchadorSE *&);
-void main_card(NodoLuchadorSE *&, Luchador [][5], int []);
+void mainCard(NodoLuchadorSE*, Luchador[]);
 void mostrar_lista(NodoLuchadorSE *lista);
 void guardar_gimnasio(NodoLuchadorSE *lista);
 void cargarGimnasio(NodoLuchadorSE *&lista);
 
 // Función sugerida
-Luchador ingresar_luchador() {
+Luchador ingresar_luchador(NodoLuchadorSE* lista) {
+    NodoLuchadorSE* paux = lista;
     
     Luchador nuevo;
     cout << "\n Ingresar datos del nuevo atleta: " << endl;
     
-    cout << "ID: ";
-    cin >> nuevo.id;
-    cin.ignore(); 
 
-    cout << "Nombre (max 10 caracteres): "; //Se acepta un nombre, por eso no uso getinline...
+    int aux = 0;
+    while(paux!=NULL){
+        if(paux->info.id > aux){
+            aux = paux->info.id;
+        }paux = paux->sgte;
+    }
+
+    nuevo.id = aux+1;
+
+    cout << "Nombre (max 10 caracteres): "<< endl; //Se acepta un nombre, por eso no uso getinline...
     cin >> nuevo.nombre;
 
+    cin.ignore();
+
     cout << "Apodo (max 10 caracteres): ";
-    cin.getline(nuevo.apodo, 11);
-    
-    cout << "Peso: ";
+    cin.getline(nuevo.apodo, 31);
+        
+    cout << "Peso: "<< endl;
     cin >> nuevo.peso;
 
-    cout << "Cantidad de Victorias: ";
+    cout << "Cantidad de Victorias: "<< endl;
     cin >> nuevo.victorias;
 
-    cout << "Cantidad de Derrotas: ";
+    cout << "Cantidad de Derrotas: "<< endl;
     cin >> nuevo.derrotas;
 
     return nuevo;
@@ -64,10 +73,12 @@ int main()
     NodoLuchadorSE *lista=NULL;
     cargarGimnasio(lista);
     mostrar_lista(lista);
+    menu(ranking, lista);
     while (lista)  // Libero la memoria
     {
         liberar_memoria(lista,lista->info.id);
     }
+
     
     return 0;
 }
@@ -80,15 +91,6 @@ void menu(Luchador vec[], NodoLuchadorSE *&lista)
 
     int id;
 
-    //esto es para la "2- Generar Main Card:
-    Luchador lucha_estelar[8][5];
-    int contadores[8];
-    struct categorias_peso
-    {
-        char peso[11];
-    };
-
-    categorias_peso categoria[8] = {{"Mosca"},{"Gallo"},{"Pluma"},{"Ligero"},{"Wélter"},{"Medio"},{"Semipesado"},{"Pesado"}};
 
     // Variable sugerida
     Luchador luchador;
@@ -101,54 +103,37 @@ void menu(Luchador vec[], NodoLuchadorSE *&lista)
         "3- Actualizar Récord:\n"<<
         "4- Guardar Gimnasio:\n"<<
         "5- Cargar Gimnasio:\n"<<
-        "* -Salir\n"<<
+        "0- Abortar programa\n"<<
         "Seleccionar una opción (de 1 a 5, cualquier otro número termina el programa): ";
         cin>>num;
 
         switch (num)
         {
             case 1:
-                // Insertar un nuevo luchador en la lista dinámica
-                // de forma ordenada por puntaje (victorias - derrotas).
-                luchador=ingresar_luchador();
+                luchador=ingresar_luchador(lista);
                 cargar_ordenado(lista,luchador);
                 break;
             
             case 2:
-
                 cout<<"Los luchadores que participarán en las peleas estelares:"<<endl;
-
-                main_card(lista, lucha_estelar, contadores);
-
-                for (int i = 0; i < 8; i++)
+                mainCard(lista, vec);
+                for (int i = 0; i < 5; i++)
                 {
-                    cout << "Categoria " << categoria[i].peso << endl;
-
-                    if (contadores[i] == 0)
-                        cout << "No hay luchadores\n";
-                    else
-                    {
-                        for (int j = 0; j < contadores[i]; j++)
-                        {
-                            cout << "Top " << j+1 << endl;
-                            cout << "ID: " << lucha_estelar[i][j].id << endl;
-                            cout << "Nombre: " << lucha_estelar[i][j].nombre << endl;
-                            cout<< "Victorias: " << lucha_estelar[i][j].victorias << endl;
-                            cout<< "Derrotas: "<< lucha_estelar[i][j].derrotas<< endl;
-                        }
-                    }
+                    cout << "Nombre: " << vec[i].nombre << endl;
+                    cout << "Top " << i+1 << endl;
+                    cout << "Puntaje: " << vec[i].victorias-vec[i].derrotas << endl;
+                    cout << "ID: " << vec[i].id << endl;
+                    cout << "Victorias: " <<vec[i].victorias << endl;
+                    cout << "Derrotas: " << vec[i].derrotas << endl;
+                    cout << "=============================" << endl;
                 }
-                        
                 break;
             
             case 3:
-                // Me pide buscar un luchador por ID y modificar su contador de victorias y derrotas
                 cout << "Ingrese el ID del luchador a actualizar: ";
-                cin >> id; //ingreso el ID del luchador a actualizar
-                
-                luchador = busqueda_id_secuencial(lista, id); //busco al luchador por ID en la lista
-                
-                if (luchador.id < 0) //confirmo si existe el id ingresado
+                cin >> id;
+                luchador = busqueda_id_secuencial(lista, id);
+                if (luchador.id < 0)
                 {
                     cout << "El ID del luchador no existe" << endl; 
                 }
@@ -157,33 +142,32 @@ void menu(Luchador vec[], NodoLuchadorSE *&lista)
                     cout << "Luchador encontrado: " << luchador.nombre << endl;
                     cout << "Victorias actuales: " << luchador.victorias << endl;
                     cout << "Derrotas actuales: " << luchador.derrotas << endl;
-                    //datos actuales del luchador encontrado
-
                     cout << "\nIngrese nuevas victorias: "; cin >> luchador.victorias; 
                     cout << "Ingrese nuevas derrotas: "; cin >> luchador.derrotas;
-                    //actualizo los datos del luchador encontrado
-
-                    liberar_memoria(lista, id); // Tengo q eliminar la versión vieja del nodo
-                    cargar_ordenado(lista, luchador); // se inserta al luchador actualizado y se reordena automáticamente
-                    
+                    liberar_memoria(lista, id);
+                    cargar_ordenado(lista, luchador);
                     cout << "Récord actualizado exitosamente." << endl;
                 }
                 break;
 
             case 4:
-                // Guardar la lista dinámica en un archivo.
                 guardar_gimnasio(lista);
                 break;
 
             case 5:
-                // Al iniciar el programa, se debe leer el archivo
-                // y reconstruir la lista en memoria.
+                while (lista)
+                {
+                    liberar_memoria(lista, lista->info.id);
+                }
+                cargarGimnasio(lista);
                 break;
-            
-            default:
-                // Condición de salida del menú:
-                // Si el usuario ingresa un número fuera del rango 1-5
+
+            case 0:
                 salida = true;
+                break;
+
+            default:
+                cout << "Ingresar un numero correcto" << endl;
         }
         
 
@@ -204,7 +188,7 @@ void cargar_ordenado(NodoLuchadorSE *&lista, Luchador &luchador)
     
     // Mientras el puntero no sea NULL y el puntaje del nuevo luchador
     // sea mayor que el de la lista, continúo avanzando.
-    while (paux && (paux->info.victorias - paux->info.derrotas) < 
+    while (paux && (paux->info.victorias - paux->info.derrotas) > 
            (luchador.victorias - luchador.derrotas))
     {
         anterior=paux;
@@ -309,54 +293,6 @@ Luchador busqueda_id_secuencial(NodoLuchadorSE *&lista, int id)
 }
 
 
-void main_card(NodoLuchadorSE *& lista, Luchador v[8][5], int contadores[8])
-{ /*
-    Peso Mosca (Flyweight): hasta 125 lbs (56.7 kg).
-    Peso Gallo (Bantamweight): hasta 135 lbs (61.2 kg).
-    Peso Pluma (Featherweight): hasta 145 lbs (65.8 kg).
-    Peso Ligero (Lightweight): hasta 155 lbs (70.3 kg).
-    Peso Wélter (Welterweight): hasta 170 lbs (77.1 kg).
-    Peso Medio (Middleweight): hasta 185 lbs (83.9 kg).
-    Peso Semipesado (Light Heavyweight): hasta 205 lbs (93.0 kg).
-    Peso Pesado (Heavyweight): 206 a 265 lbs (93.4 - 120.2 kg).
-    */
-   NodoLuchadorSE *paux= lista;
-    for (int i = 0; i < 8; i++)
-    {
-        contadores[i] = 0;
-    }
-
-    while (paux)
-    {
-        int categoria = -1;
-
-        if (paux->info.peso <=56.7)
-        categoria = 0;
-        else if (paux->info.peso <=61.2) 
-        categoria = 1;
-        else if (paux->info.peso <=65.8) 
-        categoria = 2;
-        else if (paux->info.peso <=70.3) 
-        categoria = 3;
-        else if (paux->info.peso <=77.1) 
-        categoria = 4;
-        else if (paux->info.peso <=83.9) 
-        categoria = 5;
-        else if (paux->info.peso <=93.0) 
-        categoria = 6;
-        else if (paux->info.peso <=120.2) 
-        categoria = 7;
-
-        if (categoria != -1 && contadores[categoria] < 5)
-        {
-            v[categoria][contadores[categoria]] = paux->info;
-            contadores[categoria]++;
-        }
-
-        paux = paux->sgte;
-    }
-
-}
 
 void mostrar_lista(NodoLuchadorSE *lista)
 {
@@ -457,4 +393,14 @@ void cargarGimnasio(NodoLuchadorSE *&lista){
     fclose(archivo);
     cout << "Los luchadores fueron cargados en la lista"<< endl;
     return;
+}
+
+void mainCard(NodoLuchadorSE* lista, Luchador V[]){
+
+    NodoLuchadorSE* paux=lista;
+    for(int i = 0; i < 5; i++){
+        V[i] = paux->info;
+        paux = paux->sgte;
+    }
+
 }
