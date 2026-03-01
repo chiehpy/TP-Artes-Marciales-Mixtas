@@ -30,7 +30,45 @@ void guardar_gimnasio(NodoLuchadorSE *lista);
 void cargarGimnasio(NodoLuchadorSE *&lista);
 
 // Función sugerida
-Luchador ingresar_luchador();
+Luchador ingresar_luchador() {
+    
+    Luchador nuevo;
+    cout << "\n Ingresar datos del nuevo atleta: " << endl;
+    
+    cout << "ID: ";
+    cin >> nuevo.id;
+    cin.ignore(); 
+
+    cout << "Nombre (max 10 caracteres): "; //Se acepta un nombre, por eso no uso getinline...
+    cin >> nuevo.nombre;
+
+    cout << "Apodo (max 10 caracteres): ";
+    cin.getline(nuevo.apodo, 11);
+    
+    cout << "Peso: ";
+    cin >> nuevo.peso;
+
+    cout << "Cantidad de Victorias: ";
+    cin >> nuevo.victorias;
+
+    cout << "Cantidad de Derrotas: ";
+    cin >> nuevo.derrotas;
+
+    return nuevo;
+}
+
+void cargar_desde_archivo(NodoLuchadorSE *&lista) {
+    FILE *f = fopen("archivo.dat", "rb");
+    if (f == NULL) 
+        return;
+    
+    Luchador aux;
+
+    while (fread(&aux, sizeof(Luchador), 1, f)) {
+        cargar_ordenado(lista, aux);
+    }
+    fclose(f);
+}
 
 int main()
 {
@@ -241,6 +279,11 @@ void liberar_memoria(NodoLuchadorSE *&lista, int id)
             anterior=actual;
             actual=actual->sgte;
         }
+        //Si no encontro el id.
+        if (!actual){
+            cout << "ID no encontrado\n";
+            return;
+        }
         
         // El nodo actual es el que se debe eliminar
         eliminar=actual;
@@ -325,6 +368,7 @@ void main_card(NodoLuchadorSE *& lista, Luchador v[8][5], int contadores[8])
 
         paux = paux->sgte;
     }
+
 }
 
 void mostrar_lista(NodoLuchadorSE *lista)
