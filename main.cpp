@@ -106,7 +106,7 @@ void menu(Luchador vec[], NodoLuchadorSE *&lista)
         "5- Cargar Gimnasio:\n"<<
         "6- Actualizar excedidos de peso según categoria:\n"<<        
         "0- Abortar programa\n"<<
-        "Seleccionar una opción (de 1 a 5, cualquier otro número termina el programa): ";
+        "Seleccionar una opción (de 0 a 6, cualquier otro número termina el programa): ";
         cin>>num;
 
         switch (num)
@@ -469,4 +469,5 @@ void corteDePeso(NodoLuchadorSE*& lista){
 
     cout << "El archivo de excedidos fue actualizado con exito" << endl;
     return;
+
 }
