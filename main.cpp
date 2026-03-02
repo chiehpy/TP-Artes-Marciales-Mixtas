@@ -63,6 +63,7 @@ Luchador ingresar_luchador(NodoLuchadorSE* lista) {
 
     cout << "Cantidad de Derrotas: "<< endl;
     cin >> nuevo.derrotas;
+    cout << "=============================" << endl;
 
     return nuevo;
 }
@@ -149,6 +150,7 @@ void menu(Luchador vec[], NodoLuchadorSE *&lista)
                     liberar_memoria(lista, id);
                     cargar_ordenado(lista, luchador);
                     cout << "Récord actualizado exitosamente." << endl;
+                    cout << "=============================" << endl;
                 }
                 break;
 
@@ -334,6 +336,7 @@ void guardar_gimnasio(NodoLuchadorSE *lista)
     if (!lista)
     {
         cout << "La lista está vacía. No hay nada que guardar." << endl;
+        cout << "=============================" << endl;
         return;
     }
 
@@ -342,6 +345,7 @@ void guardar_gimnasio(NodoLuchadorSE *lista)
     if (archivo == NULL)
     {
         cout << "Error al abrir el archivo para guardar." << endl;
+        cout << "=============================" << endl;
         return;
     }
 
@@ -367,6 +371,7 @@ void guardar_gimnasio(NodoLuchadorSE *lista)
 
     fclose(archivo);
     cout << "Gimnasio guardado exitosamente en 'luchadores.dat'" << endl;
+    cout << "=============================" << endl;
 }
 
 /* funcion cargarGimanasio:
@@ -397,6 +402,7 @@ void cargarGimnasio(NodoLuchadorSE *&lista){
     }
     fclose(archivo);
     cout << "Los luchadores fueron cargados en la lista"<< endl;
+    cout << "=============================" << endl;
     return;
 }
 
@@ -438,6 +444,7 @@ void corteDePeso(NodoLuchadorSE*& lista){
         case 8: limite = 120.2; break;
         default:
             cout << "Opcion invalida" << endl;
+            cout << "=============================" << endl;
             return;
     }
     
@@ -468,6 +475,6 @@ void corteDePeso(NodoLuchadorSE*& lista){
 
 
     cout << "El archivo de excedidos fue actualizado con exito" << endl;
+     cout << "=============================" << endl;
     return;
-
 }
