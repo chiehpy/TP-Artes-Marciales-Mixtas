@@ -19,15 +19,16 @@ struct NodoLuchadorSE
 };
 
 //funciones del programa
-void menu(Luchador [],NodoLuchadorSE *&);
-Luchador busqueda_id_secuencial(NodoLuchadorSE *&, int);
-void liberar_memoria(NodoLuchadorSE *&, int);
-void cargar_ordenado(NodoLuchadorSE *&, Luchador&);
-void actualizar_ranking(Luchador [],NodoLuchadorSE *&);
-void mainCard(NodoLuchadorSE*, Luchador[]);
-void mostrar_lista(NodoLuchadorSE *lista);
-void guardar_gimnasio(NodoLuchadorSE *lista);
-void cargarGimnasio(NodoLuchadorSE *&lista);
+void menu(Luchador[], NodoLuchadorSE*& lista);
+Luchador busqueda_id_secuencial(NodoLuchadorSE*& lista, int id);
+void liberar_memoria(NodoLuchadorSE*& lista, int id);
+void cargar_ordenado(NodoLuchadorSE*& lista, Luchador& luchador);
+void actualizar_ranking(Luchador[], NodoLuchadorSE*& lista);
+void mainCard(NodoLuchadorSE* lista, Luchador[]);
+void mostrar_lista(NodoLuchadorSE* lista);
+void guardar_gimnasio(NodoLuchadorSE* lista);
+void cargarGimnasio(NodoLuchadorSE*& lista);
+void corteDePeso(NodoLuchadorSE*& lista);
 
 // Función sugerida
 Luchador ingresar_luchador(NodoLuchadorSE* lista) {
@@ -103,6 +104,7 @@ void menu(Luchador vec[], NodoLuchadorSE *&lista)
         "3- Actualizar Récord:\n"<<
         "4- Guardar Gimnasio:\n"<<
         "5- Cargar Gimnasio:\n"<<
+        "6- Actualizar excedidos de peso según categoria:\n"<<        
         "0- Abortar programa\n"<<
         "Seleccionar una opción (de 1 a 5, cualquier otro número termina el programa): ";
         cin>>num;
@@ -160,6 +162,9 @@ void menu(Luchador vec[], NodoLuchadorSE *&lista)
                     liberar_memoria(lista, lista->info.id);
                 }
                 cargarGimnasio(lista);
+                break;
+            case 6:
+                corteDePeso(lista);
                 break;
 
             case 0:
@@ -403,4 +408,65 @@ void mainCard(NodoLuchadorSE* lista, Luchador V[]){
         paux = paux->sgte;
     }
 
+}
+
+void corteDePeso(NodoLuchadorSE*& lista){
+
+    int opcion;
+    float limite;
+
+
+    cout << "\nSeleccione la categoria de peso:" << endl;
+    cout << "1- Peso Mosca (hasta 56.7 kg)" << endl;
+    cout << "2- Peso Gallo (hasta 61.2 kg)" << endl;
+    cout << "3- Peso Pluma (hasta 65.8 kg)" << endl;
+    cout << "4- Peso Ligero (hasta 70.3 kg)" << endl;
+    cout << "5- Peso Welter (hasta 77.1 kg)" << endl;
+    cout << "6- Peso Medio (hasta 83.9 kg)" << endl;
+    cout << "7- Peso Semipesado (hasta 93.0 kg)" << endl;
+    cout << "8- Peso Pesado (hasta 120.2 kg)" << endl;
+    cout << "Seleccione una opcion: ";
+    cin >> opcion;
+    switch(opcion){
+        case 1: limite = 56.7; break;
+        case 2: limite = 61.2; break;
+        case 3: limite = 65.8; break;
+        case 4: limite = 70.3; break;
+        case 5: limite = 77.1; break;
+        case 6: limite = 83.9; break;
+        case 7: limite = 93.0; break;
+        case 8: limite = 120.2; break;
+        default:
+            cout << "Opcion invalida" << endl;
+            return;
+    }
+    
+
+    FILE* archivo = fopen("excedidos.dat", "ab");
+
+    if(archivo == NULL){
+        cout << "Error al abrir el archivo de excedidos" << endl;
+        return;
+    }
+
+
+    NodoLuchadorSE* paux = lista;
+
+    while(paux != NULL){
+        if(paux->info.peso > limite){
+            fwrite(&(paux->info), sizeof(Luchador), 1, archivo);
+            NodoLuchadorSE* siguiente = paux->sgte;
+            liberar_memoria(lista, paux->info.id);
+            paux = siguiente;
+        }
+        else{
+            paux = paux->sgte;
+        }
+    }
+
+    fclose(archivo);
+
+
+    cout << "El archivo de excedidos fue actualizado con exito" << endl;
+    return;
 }
