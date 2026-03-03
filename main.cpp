@@ -409,7 +409,7 @@ void cargarGimnasio(NodoLuchadorSE *&lista){
 void mainCard(NodoLuchadorSE* lista, Luchador V[]){
     NodoLuchadorSE* paux=lista;
     for(int i = 0; i < 5; i++){
-        if(paux == NULL) break;  // ✅ esto lo salva
+        if(paux == NULL) break; 
         V[i] = paux->info;
         paux = paux->sgte;
     }
@@ -477,4 +477,5 @@ void corteDePeso(NodoLuchadorSE*& lista){
      cout << "=============================" << endl;
     return;
 }
+
 
